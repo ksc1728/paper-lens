@@ -10,13 +10,10 @@ A focused retrieval-augmented generation (RAG) project. Upload one research PDF,
 - Overlapping chunking that preserves paper, page, section name, and section level
 - Sentence Transformer embeddings stored in a FAISS cosine-similarity index
 - Semantic retrieval within the uploaded paper
-- Exact section listing, extraction, and extractive section-wise summaries
 - Grounded answer generation using Gemini or Groq
-- An extractive fallback when no LLM key is configured
 - Clickable inline citations mapped to `Citation [n] — paper.pdf — Page n` source cards
-- Deterministic title, author, page-count, and abstract answers that work without an LLM
-- Automatic retry and Gemini/Groq failover for temporary 429/5xx provider errors
-- Automated tests for chunking, retrieval, and citation metadata
+- Deterministic title, author, page-count, and abstract answers 
+
 
 ##
 Metadata (`paper`, `page`, `section_name`, `section_level`, `chunk_id`, and text) is stored beside the FAISS vectors and returned with every retrieval result.
@@ -68,8 +65,6 @@ cd backend
 pytest -q
 ```
 
-Tests use a deterministic fake embedder.
-
 ## API
 
 | Method | Endpoint | Purpose |
@@ -80,27 +75,19 @@ Tests use a deterministic fake embedder.
 | `POST` | `/api/ask` | Retrieve passages and generate a cited answer |
 | `GET` | `/health` | Health check |
 
-## Design decisions worth explaining in an interview
 
-- FAISS `IndexFlatIP` is used with L2-normalized embeddings, making inner product equivalent to cosine similarity.
-- Chunk overlap reduces the chance that an answer-spanning sentence is split across boundaries.
-- Exact structural questions bypass vector search; FAISS is reserved for semantic content questions.
-- Narrowing the application to one paper avoids misleading cross-paper comparisons and produces a clearer portfolio story.
-- Citation metadata is attached during extraction and never inferred by the LLM.
-- Retrieved context is delimited and the prompt tells the model to use only that context and to admit insufficient evidence.
-- Upload, retrieval, and generation are separate modules, which makes each unit testable and replaceable.
 
 ## Limitations
 
-- Accepts text-based PDF files only; DOCX, URLs, HTML, scanned/image-only PDFs, password-protected PDFs, and OCR are outside this version.
+- Accepts text-based PDF files only.
 - Heading detection is layout-aware but heuristic because publishers use inconsistent PDF structures.
-- Embedded PDF metadata and first-page layouts vary, so author and affiliation extraction is labelled as extracted information rather than guaranteed bibliographic data.
-- Tables, figures, equations, and reading order in complex multi-column layouts may not be reconstructed perfectly.
-- Printed page labels may differ from the PDF page numbers shown by the application.
-- The index is single-user and local; production multi-user use would require authentication and per-user storage.
 - This version uses dense retrieval only. It does not claim hybrid BM25 retrieval or measured accuracy gains.
 - Multi-paper comparison is intentionally not supported.
 
 ## Screenshots
+<img width="1114" height="795" alt="image" src="https://github.com/user-attachments/assets/c96cdf32-c369-4ba4-9683-de91915074f0" />
+<img width="1114" height="377" alt="image" src="https://github.com/user-attachments/assets/6108dc3c-513d-4db2-bd06-200e9f64175a" />
+<img width="1114" height="771" alt="image" src="https://github.com/user-attachments/assets/c5693ac0-c722-42e4-872e-9dc2a6001b26" />
+
 
 
