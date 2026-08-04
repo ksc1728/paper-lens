@@ -1,6 +1,6 @@
-# PaperLens — Research Paper Analyzer
+# PaperLens - Research Paper Analyzer
 
-A focused, defensible retrieval-augmented generation (RAG) project. Upload one research PDF, inspect its detected structure, ask questions, and receive answers grounded in passages with explicit page citations.
+A focused retrieval-augmented generation (RAG) project. Upload one research PDF, inspect its detected structure, ask questions, and receive answers grounded in passages with explicit page citations.
 
 ## What is genuinely implemented
 
@@ -18,21 +18,7 @@ A focused, defensible retrieval-augmented generation (RAG) project. Upload one r
 - Automatic retry and Gemini/Groq failover for temporary 429/5xx provider errors
 - Automated tests for chunking, retrieval, and citation metadata
 
-## Architecture
-
-```mermaid
-flowchart LR
-  A[One research PDF] --> B[Layout + metadata extraction]
-  B --> C[Document → Section → Chunk]
-  C --> D[Sentence Transformer]
-  D --> E[(FAISS index)]
-  Q[User question] --> F[Query embedding]
-  F --> E
-  E --> G[Top-k passages]
-  G --> H[Gemini / Groq]
-  H --> I[Grounded answer + citations]
-```
-
+##
 Metadata (`paper`, `page`, `section_name`, `section_level`, `chunk_id`, and text) is stored beside the FAISS vectors and returned with every retrieval result.
 
 ## Project structure
@@ -58,13 +44,12 @@ Requirements: Python 3.10+, Node 18+, npm.
 ```bash
 cd backend
 python -m venv .venv
-source .venv/bin/activate          # Windows: .venv\\Scripts\\activate
+source .venv/bin/activate         
 pip install -r requirements.txt
 cp ../.env.example ../.env
 uvicorn app.api:app --reload --port 8000
 ```
 
-The embedding model downloads on first run. Add either `GEMINI_API_KEY` or `GROQ_API_KEY` to `.env`. Without a key, the app still runs and returns the best retrieved passages as an explicitly labelled extractive answer.
 
 ### 2. Frontend
 
@@ -83,7 +68,7 @@ cd backend
 pytest -q
 ```
 
-Tests use a deterministic fake embedder, so they do not download a model or call an external API.
+Tests use a deterministic fake embedder.
 
 ## API
 
@@ -118,12 +103,4 @@ Tests use a deterministic fake embedder, so they do not download a model or call
 
 ## Screenshots
 
-After running the project, add screenshots to `docs/screenshots/` showing: (1) a detected paper and section count, (2) a cited answer with expanded citations, (3) section extraction, and (4) passing tests. This repository does not include fabricated screenshots.
 
-## Resume wording
-
-**PaperLens — Research Paper Analyzer** — Python, FastAPI, React, FAISS, Sentence Transformers, Gemini/Groq
-
-- Built a section-aware RAG application for analysing research PDFs and answering document-grounded questions with page-level citations.
-- Implemented layout-based heading detection and a persisted `Document → Section → Chunk` hierarchy before Sentence Transformer embedding and FAISS retrieval.
-- Developed FastAPI and React interfaces for section extraction, semantic search, cited generation, and resilient LLM fallback, with automated tests for structure, chunking, retrieval, and citation metadata.
